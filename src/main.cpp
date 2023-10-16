@@ -9,7 +9,10 @@
 
 #include "vex.h"
 #include <cmath>
-
+#include <cstdio>
+#include "thread"
+#define sin(r) sin(r / 180 * M_PI)
+#define cos(r) cos(r / 180 * M_PI)
 using namespace vex;
 
 // A global instance of competition
@@ -45,33 +48,33 @@ pneumatics raiseIntake  = digital_out(PORT22);
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
- #define inchesToDegrees(inches) 360*inches/(wheelSize*M_PI);
- #define degreesToInches(degrees)  degrees*wheelSize*M_PI/360;
+#define inchesToDegrees(inches) 360*inches/(wheelSize*M_PI);
+#define degreesToInches(degrees)  degrees*wheelSize*M_PI/360;
 
-// double currentX =  0;
-// double currentY = 0;
-// double prevX = 0;
-// double prevY = 0;
+double currentX =  0;
+double currentY = 0;
+double prevX = 0;
+double prevY = 0;
 
-// double robotPosition[3]; //0=x 1=y 2=rotation
+double robotPosition[3]; //0=x 1=y 2=rotation
 
-// int calculatePosition(){
-//   while(true){
-//     currentX = degreesToInches(RF.position(degrees));
-//     currentY = degreesToInches(odom.rotation(degrees));
+int calculatePosition(){
+  while(true){
+    currentX = degreesToInches(RF.position(degrees));
+    currentY = degreesToInches(RF.position(degrees));
 
-//     robotPosition[0] = (currentX - prevX) * cos(IMU.rotation(degrees)); //x
-//     robotPosition[1] = (currentY - prevY) * sin(IMU.rotation(degrees)); //y
-//     robotPosition[2] = IMU.rotation(degrees);
+    robotPosition[0] += (currentX - prevX) * cos(IMU.rotation(degrees)); //x
+    robotPosition[1] += (currentY - prevY) * sin(IMU.rotation(degrees)); //y
+    robotPosition[2] += IMU.rotation(degrees);
 
-//     prevX = currentX;
-//     prevY = currentY;
+    prevX = currentX;
+    prevY = currentY;
 
-//     task::sleep(5);
-//   }
-//   return 0;
+    task::sleep(5);
+  }
+  return 0;
 
-// }
+}
 
 /*---------------------------------------------------------------------------*/
 /*                          PID Function                                     */
@@ -139,12 +142,12 @@ int PID_running(){
 }
 
 void brainDisplay(){
-    // Brain.Screen.clearScreen();
-    // Brain.Screen.setCursor(1,1);
-    // Brain.Screen.print("x: %f, y: %f, angle: %f", robotPosition[0], robotPosition[1], robotPosition[2]);
-    // Brain.Screen.newLine();
-    // Brain.Screen.print("RF: %f RM: %f RB: %f LF: %f LM: %f LB: %f", RF.position(degrees), RM.position(degrees), RB.position(degrees), LF.position(degrees), LM.position(degrees), LB.position(degrees), );
-    // Brain.Screen.newLine();
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(1,1);
+    Brain.Screen.print("x: %f, y: %f, angle: %f", robotPosition[0], robotPosition[1], robotPosition[2]);
+    Brain.Screen.newLine();
+    Brain.Screen.print("RF: %f RM: %f RB: %f LF: %f LM: %f LB: %f", RF.position(degrees), RM.position(degrees), RB.position(degrees), LF.position(degrees), LM.position(degrees), LB.position(degrees));
+    Brain.Screen.newLine();
 
     wait(100, msec);
 }
@@ -279,6 +282,9 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
+
+  thread display(brainDisplay);
+  display.join();
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
