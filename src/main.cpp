@@ -35,15 +35,12 @@ motor intake = motor(PORT8, ratio6_1, false);
 motor puncher = motor(PORT4, ratio18_1, true); 
 inertial IMU = inertial(PORT18); 
 //rotation odom = rotation(PORT19); //wrong port
-pneumatics raiseIntake  = digital_out(PORT22);
+triport raiseIntake  = triport('A');
+digital_out pnuematics raise = digital_out(22);
 
 
 /*---------------------------------------------------------------------------*/
 /*                          Calculate Displacement                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
 /*                                                                           */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
@@ -73,15 +70,10 @@ int calculatePosition(){
     task::sleep(5);
   }
   return 0;
-
 }
 
 /*---------------------------------------------------------------------------*/
 /*                          PID Function                                     */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
-/*                                                                           */
 /*                                                                           */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
@@ -283,8 +275,8 @@ int main() {
   // Run the pre-autonomous function.
   pre_auton();
 
-  thread display(brainDisplay);
-  display.join();
+  thread display = thread(brainDisplay);
+  thread calcPos = thread(calculatePosition);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
