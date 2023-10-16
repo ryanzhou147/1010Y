@@ -1,28 +1,24 @@
-#include "pid/pid.h"
+// #include "pid/pid.h"
 
-PID::PID(double k[3]){
-  kP = k[0];
-  kI = k[1];
-  kD = k[2];
-}
+// double movePower(){
+//   currentPosition = (LF.position(degrees)+LM.position(degrees)+LB.position(degrees)+RF.position(degrees)+RM.position(degrees)+RB.position(degrees))/6;
+//   error = desiredPosition - currentPosition;
+//   totalError += error;
 
-double PID::get_value(double error){
-  //Derivative
-  derivative = error - prevError;
+//   prevError=error;
+//   return KP * error + KI * (error - prevError) + KD * totalError;
 
-  //Integral if its in the activation zone
-  if(std::abs(error)<errorActiveZone){
-       totalError += error;
-  }
-  else{
-       totalError = 0;
-  }
+// }
 
-  //Assigns to prevError
-  prevError = error;
+// double turnPower(){
+//   inertial_error = desiredDirection - IMU.rotation(degrees);
+//   inertial_totalError += inertial_error;
 
-  if(std::abs(error)<1e-3){
-    return 0; //Target reached, stop
-  }
-  else return (error*kP + totalError*kI + derivative*kD);
-}
+//   inertial_prevError=inertial_error;
+//   return inertial_KP *  inertial_error + inertial_KI * (inertial_error - inertial_prevError) + inertial_KD * inertial_totalError;
+// }
+
+   
+   
+
+
